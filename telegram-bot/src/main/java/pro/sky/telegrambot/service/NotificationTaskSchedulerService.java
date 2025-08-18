@@ -5,9 +5,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import pro.sky.telegrambot.entity.NotificationTask;
 import pro.sky.telegrambot.repository.NotificationTaskRepository;
-import com.pengrad.telegrambot.TelegramBot;
-import com.pengrad.telegrambot.request.SendMessage;
-
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -19,7 +16,7 @@ public class NotificationTaskSchedulerService {
     private NotificationTaskRepository notificationTaskRepository;
 
     @Autowired
-    private TelegramBot telegramBot;
+    private TelegramMessageSender telegramMessageSender;
 
     @Scheduled(cron = "0 * * * * *") // каждую минуту в начале минуты
     public void checkAndSendNotifications() {
@@ -29,7 +26,7 @@ public class NotificationTaskSchedulerService {
         System.out.println("[Scheduler] Найдено задач: " + tasks.size());
         tasks.forEach(task -> {
             System.out.println("[Scheduler] Отправка напоминания в чат " + task.getChatId() + ": " + task.getMessage());
-            telegramBot.execute(new SendMessage(task.getChatId(), task.getMessage()));
+            telegramMessageSender.sendMessage(task.getChatId(), task.getMessage());
         });
     }
 }
